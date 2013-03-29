@@ -1,17 +1,19 @@
 Noder - Simple HTTP Server
 ========
 
-h2.Install
+#Install
+Install using npm...
 ```bash
 # npm install noder -g
 ```
 
-Usage
+#Usage
 ```bash
 # noder
 Server running at http://127.0.0.1:1337/
 ```
 
+#View
 Browser View http://127.0.0.1:1337/test.html (Assump that the test.html exist in the current folder)
 ```bash
 <Buffer 23 21 2f 62 69 6e 2f 62 61 73 68 0a 63 64 20 2f 6f 70 74 0a 23 77 67 65 74 20 68 74 74 70 3a 2f 2f 6e 6f 64 65 6a 73 2e 6f 72 67 2f 64 69 73 74 2f 76 30 ...>
