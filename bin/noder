@@ -1,0 +1,17 @@
+#!/usr/bin/env node
+var fs = require('fs')
+  , http = require('http');
+http.createServer(function (req, res) {
+  console.log('>>>');
+//  res.writeHead(200, {'Content-Type': 'text/plain'});
+  var path = req.url;
+  try{ 
+    var f = fs.readFileSync('.' + path);
+    console.log(f);
+    res.end(f.toString());
+  } catch(e) {
+    console.log(e);
+    res.end('');
+  }
+}).listen(1337);
+console.log('Server running at http://127.0.0.1:1337/');
