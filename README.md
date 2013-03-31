@@ -8,12 +8,32 @@ Install using npm...
 ```
 
 #Usage
+Default, server start at 1337 port...
 ```bash
 # noder
 Server running at http://127.0.0.1:1337/
 ```
+Advance usage:
+```bash
+noder -h 192.168.1.205 -p 8080 -a png,html -d jpg
+```
+Help page:
+```bash
+# noder --help
 
-#View
+  Usage: noder [options]
+
+  Options:
+
+    -h, --help                     output usage information
+    -V, --version                  output the version number
+    -h, --host [ip]                Specific host, like 192.168.1.1, default is all ip listened
+    -p, --port <port>              Specific port, like 80,3000,8080, default is 1337
+    -a, --allow <allow file type>  Specific the allowed file types that seprate by ",", default is all
+    -d, --deny <deny file type>    Specific the denied file types that seprate by ",", default is none
+```
+
+#Open Browser
 Browser View http://127.0.0.1:1337/test.html (Assump that the test.html exist in the current folder)
 ```bash
 <Buffer 23 21 2f 62 69 6e 2f 62 61 73 68 0a 63 64 20 2f 6f 70 74 0a 23 77 67 65 74 20 68 74 74 70 3a 2f 2f 6e 6f 64 65 6a 73 2e 6f 72 67 2f 64 69 73 74 2f 76 30 ...>
