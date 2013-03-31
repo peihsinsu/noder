@@ -2,6 +2,10 @@ Noder - Simple HTTP Server
 ========
 
 This is a simple web server write by node.js. You can quickly start a web server for outside access through one line. It's easy way for frontend web developer to test prototype page and need not to build a apache or other web server.
+<div align="center">
+<img src="http://peihsinsu.github.com/images/noder-intro.png" width="80%"/><br/>
+Picture: Easy to use of noder!
+</div>
 
 #Install
 Install using npm...
