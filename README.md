@@ -13,11 +13,15 @@ Default, server start at 1337 port...
 # noder
 Server running at http://127.0.0.1:1337/
 ```
-Advance usage:
+## Advance usage:
+You can also using the parameters to control the host, port for the service listen. And the allow or deny parameters for the filter of user query.
 ```bash
 noder -h 192.168.1.205 -p 8080 -a png,html -d jpg
 ```
-Help page:
+You can see the help page for the parameters.
+
+## Help page:
+Open the help page using "noder --help".
 ```bash
 # noder --help
 
