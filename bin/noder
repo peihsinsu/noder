@@ -1,15 +1,79 @@
 #!/usr/bin/env node
 var fs = require('fs')
-  , http = require('http');
-http.createServer(function (req, res) {
-  var path = req.url;
-  try{ 
-    var f = fs.readFileSync('.' + path);
-    console.log(f);
-    res.end(f.toString());
-  } catch(e) {
-    console.log(e);
-    res.end('');
-  }
-}).listen(1337);
-console.log('Server running at http://127.0.0.1:1337/');
+  , http = require('http')
+  , p = require('commander')
+  , _ = require('underscore')
+  , ver = '0.0.1';
+
+p.version(ver)
+  .option('-h, --host [ip]', 'Specific host, like 192.168.1.1, default is all ip listened')
+  .option('-p, --port <port>', 'Specific port, like 80,3000,8080, default is 1337')
+  .option('-a, --allow <allow file type>', 'Specific the allowed file types that seprate by ",", default is all', list)
+  .option('-d, --deny <deny file type>', 'Specific the denied file types that seprate by ",", default is none', list)
+  .parse(process.argv);
+
+function list(val) {
+  return val.split(',');
+}
+
+var port = p.port || 1337
+  , host = p.host || '127.0.0.1'
+  , allow = p.allow || ''
+  , deny = p.deny || '';
+
+if(allow)
+  console.log('Got allowed setting:%s', allow);
+if(deny)
+  console.log('Got denied setting:%s', deny);
+
+var server = http.createServer(function (req, res) {
+      var path = req.url;
+      if(isAllowedFile(path)) {
+        try{ 
+          var f = fs.readFileSync('.' + path);
+          console.log(f);
+          res.end(f.toString());
+        } catch(e) {
+          console.log(e);
+          res.end('<h1>404 Page Not Found</h1>');
+        }
+      } else {
+        res.end('NOT-ALLOWED-FORMAT');
+      }
+    });
+
+function isAllowedFile(path){
+  var arr = path.split('.');
+  var fileType = arr[arr.length-1];
+  console.log('Got fileType:%s', fileType);
+  if( allow ){
+    if( _.indexOf(allow, fileType) >=0 ) {
+      console.log('By pass by allow rule.');
+      return true;
+    } else {
+      return false;
+    }
+  }  
+
+  if( deny ) {
+    if(  _.indexOf(deny, fileType) >=0 ) {
+      console.log('Filtered by deny rule.');
+      return false;
+    } else {
+      return true;
+    }
+  }  
+  
+  return true;
+}
+
+if(host)
+  server.listen(port, host);
+else
+  server.listen(port);
+
+console.log('Server running at http://%s:%s/', host, port);
+
+String.prototype.endsWith = function (s) {
+  return this.length >= s.length && this.substr(this.length - s.length) == s;
+}
