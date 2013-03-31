@@ -10,8 +10,9 @@ Picture: Easy to use of noder!
 #Install
 Install using npm...
 ```bash
-# npm install noder -g
+# sudo npm install noder -g
 ```
+PS: The "sudo" will depend on your role of this computer.
 
 #Usage
 Default, server start at 1337 port...
