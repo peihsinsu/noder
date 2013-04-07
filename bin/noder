@@ -6,7 +6,7 @@ var fs = require('fs')
   , ver = '0.0.1';
 
 p.version(ver)
-  .option('-h, --host [ip]', 'Specific host, like 192.168.1.1, default is all ip listened')
+  .option('-i, --host address <ip>', 'Specific host, like 192.168.1.1, default is all ip listened')
   .option('-p, --port <port>', 'Specific port, like 80,3000,8080, default is 1337')
   .option('-a, --allow <allow file type>', 'Specific the allowed file types that seprate by ",", default is all', list)
   .option('-d, --deny <deny file type>', 'Specific the denied file types that seprate by ",", default is none', list)
