@@ -1,6 +1,9 @@
 Noder - Simple HTTP Server
 ========
-<div align="right" style="">[中文](README.tw.md)</div>
+
+* [中文說明](README.tw.md)
+
+
 This is a simple web server write by node.js. You can quickly start a web server for outside access through one line. It's easy way for frontend web developer to test prototype page and need not to build a apache or other web server.
 <div align="center">
 <img src="http://peihsinsu.github.com/images/noder-intro.png" width="90%"/><br/>
