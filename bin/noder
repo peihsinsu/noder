@@ -3,7 +3,14 @@ var fs = require('fs')
   , http = require('http')
   , p = require('commander')
   , _ = require('underscore')
-  , ver = '0.0.1';
+  , pkginfo = JSON.parse(fs.readFileSync(__dirname + '/../package.json'))
+  , ver = pkginfo.version
+  , logger = require('../lib/logger')
+  , log = logger.logger;
+
+log.setLevel('INFO');
+
+log.info('Noder version: %s', ver);
 
 p.version(ver)
   .option('-i, --host address <ip>', 'Specific host, like 192.168.1.1, default is all ip listened')
@@ -22,37 +29,56 @@ var port = p.port || 1337
   , deny = p.deny || '';
 
 if(allow)
-  console.log('Got allowed setting:%s', allow);
+  log.trace('Got allowed setting:%s', allow);
 if(deny)
-  console.log('Got denied setting:%s', deny);
+  log.trace('Got denied setting:%s', deny);
 
 var server = http.createServer(function (req, res) {
-      var path = req.url;
-      if(isAllowedFile(path)) {
-        try{ 
-          var f = fs.readFileSync('.' + path);
-          console.log(f);
-          res.end(f.toString());
-        } catch(e) {
-          console.log(e);
-          res.end('<h1>404 Page Not Found</h1>');
-        }
-      } else {
-        res.end('NOT-ALLOWED-FORMAT');
+  var path = req.url;
+  //Reformat file location
+  if(path.indexOf('?')) {
+    path = path.split('?')[0];
+    log.trace('Reformat path to %s', path);
+  }
+
+  //Get content
+  if(isAllowedFile(path)) {
+    try{ 
+      log.trace('Reading file from %s', '.' + path);
+      var f = fs.readFileSync('.' + path);
+      logger.record(req, res);
+      res.end(f);
+    } catch(e) {
+      if(path.endsWith('.ico')) {
+        log.trace('ico not found, use default...');
+        var f = fs.readFileSync(__dirname + '/../noder.png');
+        logger.record(req, res);
+        res.end(f);
+      } else { 
+        logger.record(req, res);
+        res.statusCode = 404;
+        log.error(e);
+        res.end('<h1>404 Page Not Found</h1>');
       }
-    });
+    }
+  } else {
+    logger.record(req, res);
+    res.statusCode = 301;
+    res.end('NOT-ALLOWED-FORMAT');
+  }
+});
 
 function isAllowedFile(path){
   if(path.indexOf('/..') == 0){
-    console.log('Cannot cross folder query...');
+    log.error('Cannot cross folder query...');
     return false;
   }
   var arr = path.split('.');
   var fileType = arr[arr.length-1];
-  console.log('Got fileType:%s', fileType);
+  log.trace('Got fileType:%s', fileType);
   if( allow ){
     if( _.indexOf(allow, fileType) >=0 ) {
-      console.log('By pass by allow rule.');
+      log.trace('By pass by allow rule.');
       return true;
     } else {
       return false;
@@ -61,7 +87,7 @@ function isAllowedFile(path){
 
   if( deny ) {
     if(  _.indexOf(deny, fileType) >=0 ) {
-      console.log('Filtered by deny rule.');
+      log.trace('Filtered by deny rule.');
       return false;
     } else {
       return true;
@@ -76,7 +102,7 @@ if(host)
 else
   server.listen(port);
 
-console.log('Server running at http://%s:%s/', host, port);
+log.info('Server running at http://%s:%s/', host, port);
 
 String.prototype.endsWith = function (s) {
   return this.length >= s.length && this.substr(this.length - s.length) == s;
