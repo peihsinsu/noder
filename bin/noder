@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 var fs = require('fs')
   , http = require('http')
+  , util = require('util')
   , p = require('commander')
   , _ = require('underscore')
   , pkginfo = JSON.parse(fs.readFileSync(__dirname + '/../package.json'))
@@ -8,13 +9,10 @@ var fs = require('fs')
   , logger = require('../lib/logger')
   , log = logger.logger;
 
-log.setLevel(process.env['LOG_LEVEL']||'INFO');
-
-log.info('Noder version: %s', ver);
-
 p.version(ver)
   .option('-i, --host address <ip>', 'Specific host, like 192.168.1.1, default is all ip listened')
   .option('-p, --port <port>', 'Specific port, like 80,3000,8080, default is 1337')
+  .option('-l, --loglevel <loglevel>', 'Specific log level, generally like: FATAL, ERROR, WARN, INFO, DEBUG, TRACE')
   .option('-a, --allow <allow file type>', 'Specific the allowed file types that seprate by ",", default is all', list)
   .option('-d, --deny <deny file type>', 'Specific the denied file types that seprate by ",", default is none', list)
   .parse(process.argv);
@@ -26,16 +24,16 @@ function list(val) {
 var port = p.port || 1337
   , host = p.host || '127.0.0.1'
   , allow = p.allow || ''
-  , deny = p.deny || '';
+  , deny = p.deny || ''
+  , loglevel = p.loglevel||process.env['LOG_LEVEL']||'INFO';
 
-if(allow)
-  log.trace('Got allowed setting:%s', allow);
-if(deny)
-  log.trace('Got denied setting:%s', deny);
+/* setup log level */
+log.setLevel(loglevel);
 
+/* Server configures */
 var server = http.createServer(function (req, res) {
   var path = req.url;
-    path = path.split('?')[0];
+  path = path.split('?')[0];
   log.trace('Got request path: %s', path);
   //Reformat file location
   log.trace('path = %s, endsWith test = %s', path, path.endsWith('/'));
@@ -49,9 +47,10 @@ var server = http.createServer(function (req, res) {
 
   //Get content
   if(isAllowedFile(path)) {
+    path = '.' + path;
     try{ 
       log.trace('Reading file from %s', '.' + path);
-      var f = fs.readFileSync('.' + path);
+      var f = fs.readFileSync(path);
       logger.record(req, res);
       res.end(f);
     } catch(e) {
@@ -60,11 +59,24 @@ var server = http.createServer(function (req, res) {
         var f = fs.readFileSync(__dirname + '/../noder.png');
         logger.record(req, res);
         res.end(f);
+      } else if(e.code == 'EISDIR') { 
+        var stat = fs.statSync(path);
+        if(stat.isDirectory()) {
+          log.trace('path:%s is a dir, look for index page...', path);
+          path = path + (path.endsWith('/') ? '':'/') + 'index.html';
+          res.writeHead(302, { 'Location': path });
+          res.end();
+        }
       } else { 
-        logger.record(req, res);
         res.statusCode = 404;
-        log.error(e);
-        res.end('<h1>404 Page Not Found</h1>');
+        logger.record(req, res);
+        log.trace(e);
+        log.error('Error %s the path:%s, error code:%s', e.syscall, e.path, e.code);
+        res.end(
+          mergeTemplate(
+            __dirname+'/../pages/error.html', 
+            '<h1>404 Page Not Found</h1><p>'+e+'</p>')
+        );
       }
     }
   } else {
@@ -73,6 +85,11 @@ var server = http.createServer(function (req, res) {
     res.end('NOT-ALLOWED-FORMAT');
   }
 });
+
+function mergeTemplate(tpl, msg){
+  var out = util.format(fs.readFileSync(tpl, 'utf-8'), msg);
+  return out;
+}
 
 function isAllowedFile(path){
   if(path.indexOf('/..') == 0){
@@ -108,8 +125,13 @@ if(host)
 else
   server.listen(port);
 
+/* Noder default startup messages */
+log.info('Noder version: %s', ver);
+//permission messages 
+if(allow) log.trace('Got allowed setting:%s', allow);
+if(deny) log.trace('Got denied setting:%s', deny);
 log.info('Server running at http://%s:%s/', host, port);
-log.info('Using log level: %s (If you want to change, try "export LOV_LEVEL=INFO" in linux or "set LOG_LEVEL=INFO" in windows)', process.env['LOG_LEVEL']||'INFO' );
+log.info('Using log level: %s (If you want to change, try "export LOV_LEVEL=INFO" in linux or "set LOG_LEVEL=INFO" in windows)', loglevel);
 
 //TODO: intefrage into nodeutil
 String.prototype.endsWith = function (s) {

@@ -1,7 +1,7 @@
 {
   "name": "noder",
   "description": "Node.js Simple Web Utility",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "author": {
     "name": "Simon Su",
     "email": "simonsu.mail@gmail.com"
