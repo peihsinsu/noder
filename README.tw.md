@@ -58,3 +58,14 @@ noder -h 192.168.1.205 -p 8080 -a png,html -d jpg
 [2013-05-04 16:33:55.431] [INFO] [default] - Server running at http://127.0.0.1:1337/
 ```
 
+#LOG等級設定
+我們使用log4js來管理log的顯示等級，您可以參考log4js git: https://github.com/nomiddlename/log4js-node.git，內建設定為INFO等級log，您可以透過改變環境變數來修改log的顯示等級，如：
+Linux或Mac環境可以透過export來修改：
+```
+export LOG_LEVEL=INFO
+```
+Windows環境可以透過"set"來修改:
+```
+set LOG_LEVEL=INFO
+```
+

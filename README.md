@@ -56,3 +56,14 @@ Got fileType:html
 <Buffer 3c 68 31 3e 48 45 4c 4c 4f 2e 2e 2e 3c 2f 68 31 3e 0a>
 ```
 
+#Log level settup
+We following the log4js to write log, see: https://github.com/nomiddlename/log4js-node.git. If you want to see more log in the program, you can try to modify the environment setting of "LOG_LEVEL":
+In Linux or Mac, you can export like:
+```
+export LOG_LEVEL=INFO
+```
+In Windows, you can use "set" like:
+```
+set LOG_LEVEL=INFO
+```
+
