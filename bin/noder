@@ -34,6 +34,10 @@ log.setLevel(loglevel);
 /* Server configures */
 var server = http.createServer(function (req, res) {
   var path = req.url;
+  //to prevent chinese path problem
+  log.debug('Path ori: %s', path);
+  path = decodeURI(path);
+  log.debug('Path after: %s', path);
   path = path.split('?')[0];
   log.trace('Got request path: %s', path);
   //Reformat file location
