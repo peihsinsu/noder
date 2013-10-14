@@ -67,3 +67,11 @@ In Windows, you can use "set" like:
 set LOG_LEVEL=INFO
 ```
 
+#Read a md project
+You can use noder to see a markdown project now. Follow the command:
+
+```
+$ noder -m XXX.md
+```
+
+Then the noder will use XXX.md to be your menu page and render the other md in the main block.

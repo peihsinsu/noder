@@ -69,3 +69,13 @@ Windows環境可以透過"set"來修改:
 set LOG_LEVEL=INFO
 ```
 
+#使用Noder讀取Markdown專案
+
+目前新增了讀取本地端Markdown file的功能，您可以透過下面指令開啟md讀取功能
+
+```
+$ noder -m XXX.md
+```
+
+上面指令將會以XXX.md作為側邊的menu，並將瀏覽的md檔案render在main block中，整體性的顯示。
+
