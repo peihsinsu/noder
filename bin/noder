@@ -8,6 +8,8 @@ var fs = require('fs')
   , ver = pkginfo.version
   , logger = require('../lib/logger')
   , map = require('../lib/mapping')
+  , marked = require('marked')
+  , md = require('../lib/mdutil')
   , log = logger.logger;
 
 p.version(ver)
@@ -16,6 +18,7 @@ p.version(ver)
   .option('-l, --loglevel <loglevel>', 'Specific log level, generally like: FATAL, ERROR, WARN, INFO, DEBUG, TRACE')
   .option('-a, --allow <allow file type>', 'Specific the allowed file types that seprate by ",", default is all', list)
   .option('-d, --deny <deny file type>', 'Specific the denied file types that seprate by ",", default is none', list)
+  .option('-m, --menu <menu>', 'When use md, need to specify the menu page for default menu block')
   .parse(process.argv);
 
 function list(val) {
@@ -56,12 +59,14 @@ var server = http.createServer(function (req, res) {
     var type = path.split('.')[path.split('.').length -1];
     try{ 
       log.trace('Reading file from %s', '.' + path);
-      var f = fs.readFileSync(path);
+      var f = (type == 'md') ? fs.readFileSync(path, 'utf8') : fs.readFileSync(path);
       logger.record(req, res);
       var mime = map.getMime(type);
       log.trace('path=%s, type=%s, mime=%s', path, type,  mime);
       if(mime)
         res.writeHead('200', {'Content-Type': mime});
+      if(type == 'md')
+        f = formatMd(f);
       res.end(f);
     } catch(e) {
       if(path.endsWith('.ico')) {
@@ -80,7 +85,6 @@ var server = http.createServer(function (req, res) {
       } else { 
         res.statusCode = 404;
         logger.record(req, res);
-        log.trace(e);
         log.error('Error %s the path:%s, error code:%s', e.syscall, e.path, e.code);
         res.end(
           mergeTemplate(
@@ -148,4 +152,20 @@ String.prototype.endsWith = function (s) {
   return this.length >= s.length && this.substr(this.length - s.length) == s;
 }
 
+var tmpl = null
+  , menupage= null;
+//TODO: move to arguement
+tmpl = fs.readFileSync(__dirname + '/../pages/template.html', 'utf8');
+
+function formatMd(f) {
+  if(p.menu) {
+    menupage = fs.readFileSync('./menu.md', 'utf8');
+    var html = md.md2html(f)
+      , menuhtml = md.md2html(menupage);
+    return util.format(tmpl, menuhtml, html);
+  } else {
+    var html = md.md2html(f);
+    return util.format(tmpl, '', html);
+  }
+}
 

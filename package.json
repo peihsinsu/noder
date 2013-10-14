@@ -1,7 +1,7 @@
 {
   "name": "noder",
   "description": "Node.js Simple Web Utility",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "author": {
     "name": "Simon Su",
     "email": "simonsu.mail@gmail.com"
@@ -15,10 +15,11 @@
   "dependencies": {
     "underscore":"*",
     "log4js":"*",
-    "commander":"*"
+    "commander":"*",
+    "marked":"0.2.8"
   },
   "keywords": [
-    "http","server","web"
+    "http","server","web","markdown"
   ],
   "repository": {
     "type": "git",
