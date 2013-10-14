@@ -159,7 +159,7 @@ tmpl = fs.readFileSync(__dirname + '/../pages/template.html', 'utf8');
 
 function formatMd(f) {
   if(p.menu) {
-    menupage = fs.readFileSync('./menu.md', 'utf8');
+    menupage = fs.readFileSync(p.menu, 'utf8');
     var html = md.md2html(f)
       , menuhtml = md.md2html(menupage);
     return util.format(tmpl, menuhtml, html);
