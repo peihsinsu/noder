@@ -191,10 +191,10 @@ function flist() {
             try {
               getFiles(name, files_);
             } catch(e) {
-              console.log('err:', e);
+              log.error('err:', e);
             }
           } else {
-              files_.push(name);
+              files_.push(name.substring(1));
           }
       }
       return files_;
