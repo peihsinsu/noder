@@ -19,6 +19,7 @@ p.version(ver)
   .option('-a, --allow <allow file type>', 'Specific the allowed file types that seprate by ",", default is all', list)
   .option('-d, --deny <deny file type>', 'Specific the denied file types that seprate by ",", default is none', list)
   .option('-m, --menu <menu>', 'When use md, need to specify the menu page for default menu block')
+  .option('-t, --tree <the show dir tree list type>', 'Show the file tree list in the provided type, like: JSON, LIST')
   .parse(process.argv);
 
 function list(val) {
@@ -51,6 +52,16 @@ var server = http.createServer(function (req, res) {
     log.trace('Reformat path from %s to %s', oripath, path);
     res.writeHead(302, { 'Location': path });
     res.end();
+  }
+
+  if(p.tree && path == '/__list__') {
+    if(p.tree == 'JSON') {
+      res.writeHead(200, {"Content-Type":"application/json"});
+      return res.end(JSON.stringify(flist()));
+    } else if(p.tree == 'LIST') {
+      res.writeHead(200, {"Content-Type":"plan/txt"});
+      return res.end(flist().join('\r\n'));
+    }
   }
 
   //Get content
@@ -169,3 +180,24 @@ function formatMd(f) {
   }
 }
 
+// List current folder
+function flist() {
+  function getFiles (dir, files_){
+      files_ = files_ || [];
+      var files = fs.readdirSync(dir);
+      for (var i in files){
+          var name = dir + '/' + files[i];
+          if (fs.statSync(name).isDirectory()){
+            try {
+              getFiles(name, files_);
+            } catch(e) {
+              console.log('err:', e);
+            }
+          } else {
+              files_.push(name);
+          }
+      }
+      return files_;
+  }
+  return getFiles('.');
+}
